@@ -1,0 +1,110 @@
+import java.time.LocalDateTime;
+
+class User {
+    private int userId;
+    private String username;
+    private String email;
+    private String password;
+
+    public User(int userId, String username, String email, String password) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public void register() {
+        // Logic for user registration
+        System.out.println("User  " + username + " registered successfully.");
+    }
+
+    public void login() {
+        // Logic for user login
+        System.out.println("User  " + username + " logged in.");
+    }
+
+    public void placeBid(Auction auction, double bidAmount) {
+        Bid bid = new Bid(bidAmount, this, auction);
+        if (bid.validateBid(auction)) {
+            auction.setCurrentHighestBid(bid.getAmount());
+            System.out.println("Bid of " + bid.getAmount() + " placed by " + username + " on auction " + auction.getItemName() + ".");
+        } else {
+            System.out.println("Bid amount must be higher than the current highest bid.");
+        }
+    }
+}
+
+class Auction {
+    private int auctionId;
+    private String itemName;
+    private double startingPrice;
+    private double currentHighestBid;
+    private LocalDateTime endTime;
+
+    public Auction(int auctionId, String itemName, double startingPrice, LocalDateTime endTime) {
+        this.auctionId = auctionId;
+        this.itemName = itemName;
+        this.startingPrice = startingPrice;
+        this.currentHighestBid = startingPrice;
+        this.endTime = endTime;
+    }
+
+    public void startAuction() {
+        System.out.println("Auction for " + itemName + " started.");
+    }
+
+    public void closeAuction() {
+        System.out.println("Auction for " + itemName + " closed.");
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public double getCurrentHighestBid() {
+        return currentHighestBid;
+    }
+
+    public void setCurrentHighestBid(double currentHighestBid) {
+        this.currentHighestBid = currentHighestBid;
+    }
+}
+
+class Bid {
+    private double amount;
+    private LocalDateTime timestamp;
+    private User user;
+    private Auction auction;
+
+    public Bid(double amount, User user, Auction auction) {
+        this.amount = amount;
+        this.timestamp = LocalDateTime.now();
+        this.user = user;
+        this.auction = auction;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public boolean validateBid(Auction auction) {
+        return this.amount > auction.getCurrentHighestBid();
+    }
+}
+
+public class AuctionApp {
+    public static void main(String[] args) {
+        // Create a user
+        User user1 = new User(1, "Hussain", "syedhussainmustafa994@gmail.com", "securepassword");
+        user1.register();
+        user1.login();
+
+        // Create an auction
+        Auction auction1 = new Auction(101, "Vintage Watch", 100.0, LocalDateTime.of(2025, 12, 31, 23, 59));
+        auction1.startAuction();
+
+        // User places a bid
+        user1.placeBid(auction1, 150.0);  // Valid bid
+        user1.placeBid(auction1, 120.0);  // Invalid bid (lower than current highest bid)
+    }
+}
